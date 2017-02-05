@@ -1,0 +1,43 @@
+version: '1'
+
+services:
+
+    main:
+        image: puffinrocks/spip
+        depends_on:
+            - db
+        ports:
+            - 80
+        environment:
+            - VIRTUAL_HOST
+            - VIRTUAL_PORT=80
+            - WORDPRESS_DB_HOST=db
+            - WORDPRESS_DB_PASSWORD=spip
+        networks:
+            - front
+            - back
+            - default
+        volumes:
+            - main_data:/var/www/html
+        tmpfs:
+            - /tmp
+            #- /run - can't do that due to https://github.com/docker-library/php/issues/250
+    
+    db:
+        image: puffinrocks/mariadb
+        environment:
+            MYSQL_ROOT_PASSWORD: spip
+        volumes: 
+            - db_data:/var/lib/mysql
+
+volumes:
+    main_data:
+    db_data:
+
+networks:
+    front:
+        external:
+            name: "puffin_front"
+    back:
+        external:
+            name: "puffin_back"
